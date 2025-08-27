@@ -16,6 +16,7 @@ public class UserRouterRest {
         return route(GET(ApiConstants.API_BASE_PATH + "/users"), userHandler::getAllUsers)
                 .andRoute(POST(ApiConstants.API_BASE_PATH + "/users"), userHandler::createUser)
                 .and(route(GET(ApiConstants.API_BASE_PATH + "/users/{id}"), userHandler::getUserById))
-                .and(route(PATCH(ApiConstants.API_BASE_PATH + "/users/{id}"), userHandler::updateUser));
+                .and(route(PATCH(ApiConstants.API_BASE_PATH + "/users/{id}"), userHandler::updateUser))
+                .and(route(DELETE(ApiConstants.API_BASE_PATH + "/users/{id}"), userHandler::deleteUser));
     }
 }

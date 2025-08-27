@@ -10,12 +10,12 @@ public interface UserRepository {
 
     Mono<User> save(User user);
 
-    Mono<User> findById(BigInteger id);
+    Mono<User> findById(String id);
 
     Mono<User> findByEmail(String email);
 
     Flux<User> findAll();
 
-    Mono<Void> deleteById(BigInteger id);
+    Mono<Void> deleteById(String id);
 
 }

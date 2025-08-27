@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @Builder(toBuilder = true)
 public class User {
 
-    private BigInteger id;
+    private String id;
     private String name;
     private String lastName;
     private String documentIdentity;
@@ -25,6 +25,6 @@ public class User {
     private String phone;
     private String address;
     private float baseSalary;
-    private BigInteger roleId;
+    private String roleId;
 
 }

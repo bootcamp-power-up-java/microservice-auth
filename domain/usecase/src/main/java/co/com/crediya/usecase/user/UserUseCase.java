@@ -25,7 +25,7 @@ public class UserUseCase {
         validateUserData(cleanedUser);
         return userRepository.findByEmail(cleanedUser.getEmail())
                 .flatMap(existingUser -> Mono.error(
-                        new IllegalArgumentException(UserErrorMessages.EMAIL_ALREADY_REGISTERED.getMessage())
+                        new IllegalArgumentException(UserErrorMessages.getEmailAlreadyRegisteredMessage())
                 )).switchIfEmpty(Mono.defer(() -> userRepository.save(cleanedUser)))
                 .cast(User.class);
     }
@@ -49,13 +49,13 @@ public class UserUseCase {
 
     private void validateUserData(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
-            throw new IllegalArgumentException(UserErrorMessages.NAMES_LAST_NAMES_REQUIRED.getMessage());
+            throw new IllegalArgumentException(UserErrorMessages.getNamesLastNamesRequiredMessage());
         }
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException(UserErrorMessages.EMAIL_REQUIRED.getMessage());
+            throw new IllegalArgumentException(UserErrorMessages.getEmailRequiredMessage());
         }
         if (!user.getEmail().matches(UserConstraints.EMAIL_REGEX)) {
-            throw new IllegalArgumentException(UserErrorMessages.INVALID_EMAIL_FORMAT.getMessage());
+            throw new IllegalArgumentException(UserErrorMessages.getInvalidEmailFormatMessage());
         }
         if (user.getBaseSalary() < UserConstraints.MIN_SALARY || user.getBaseSalary() > UserConstraints.MAX_SALARY) {
             throw new IllegalArgumentException(UserErrorMessages.getSalaryOutOfRangeMessage());

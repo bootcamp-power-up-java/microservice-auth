@@ -22,6 +22,22 @@ public enum UserErrorMessages {
         return String.format(this.message, args);
     }
 
+    public static String getNamesLastNamesRequiredMessage() {
+        return NAMES_LAST_NAMES_REQUIRED.getMessage();
+    }
+
+    public static String getEmailRequiredMessage() {
+        return EMAIL_REQUIRED.getMessage();
+    }
+
+    public static String getEmailAlreadyRegisteredMessage() {
+        return EMAIL_ALREADY_REGISTERED.getMessage();
+    }
+
+    public static String getInvalidEmailFormatMessage() {
+        return INVALID_EMAIL_FORMAT.getMessage();
+    }
+
     public static String getSalaryOutOfRangeMessage() {
         return String.format(SALARY_OUT_OF_RANGE.getMessage(), UserConstraints.MAX_SALARY, UserConstraints.MIN_SALARY);
     }

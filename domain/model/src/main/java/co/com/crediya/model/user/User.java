@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigInteger;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -18,9 +19,11 @@ public class User {
     private String name;
     private String lastName;
     private String documentIdentity;
+    private LocalDate birthdate;
     private String email;
     private String password;
     private String phone;
+    private String address;
     private float baseSalary;
     private BigInteger roleId;
 

@@ -14,14 +14,15 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Table(name = UserEntityConstants.TABLE_NAME)
+@Table(UserEntityConstants.TABLE_NAME)
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class UserEntity {
 
     @Id
-    private String id = UUID.randomUUID().toString();
+    @Column
+    private UUID id;
 
     @Column
     private String name;
@@ -53,10 +54,12 @@ public class UserEntity {
     @Column
     private String roleId;
 
-    @CreatedDate
+    @CreatedDate()
+    @Column
     private LocalDateTime createdAt;
 
     @LastModifiedDate
+    @Column
     private LocalDateTime updatedAt;
 
 }

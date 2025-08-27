@@ -34,6 +34,34 @@ public class UserUseCase {
         return userRepository.findAll();
     }
 
+    public Mono<User> updateUser(User user) {
+        if (user.getId().isEmpty()) {
+            return Mono.error(new IllegalArgumentException(UserErrorMessages.getIdRequiredForUpdateMessage()));
+        }
+        System.out.println("Updating user: " + user.toString());
+        return userRepository.findById(user.getId())
+                .switchIfEmpty(Mono.error(new IllegalArgumentException(UserErrorMessages.getUserNotFoundMessage())))
+                .flatMap(existingUser -> {
+                    System.out.println("Usuario obtenido:" + existingUser.getId());
+                    System.out.println(existingUser);
+                    User cleanedUser = cleanUserData(user);
+                    if (user.getName() != null) {
+                        existingUser.setName(cleanedUser.getName());
+                    }
+                    if (user.getLastName() != null) {
+                        existingUser.setLastName(cleanedUser.getLastName());
+                    }
+                    if (user.getEmail() != null && !user.getEmail().equalsIgnoreCase(existingUser.getEmail())) {
+                        existingUser.setEmail(cleanedUser.getEmail());
+                    }
+                    validateUserData(existingUser);
+                    System.out.println("Updating existinguser" );
+                    System.out.println(existingUser);
+                    return userRepository.update(existingUser);
+                });
+    }
+
+
     public Mono<Void> deleteUserById(String id) {
         return userRepository.deleteById(id);
     }

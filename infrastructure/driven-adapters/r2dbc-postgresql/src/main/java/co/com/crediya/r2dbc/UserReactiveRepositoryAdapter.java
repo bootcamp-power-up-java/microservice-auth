@@ -15,7 +15,7 @@ import java.util.UUID;
 public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
         User,
         UserEntity,
-        String,
+        UUID,
         UserReactiveRepository
 > implements UserRepository {
     public UserReactiveRepositoryAdapter(UserReactiveRepository repository, ObjectMapper mapper) {
@@ -37,13 +37,12 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     @Override
     public Mono<User> update(User user) {
         UserEntity u = mapper.map(user, UserEntity.class);
-        u.setId(UUID.fromString(user.getId()));
         return repository.save(u)
                 .map(entity -> mapper.map(entity, User.class));
     }
 
     @Override
-    public Mono<Void> deleteById(String id) {
+    public Mono<Void> deleteById(UUID id) {
         return repository.deleteById(id)
                 .then();
     }

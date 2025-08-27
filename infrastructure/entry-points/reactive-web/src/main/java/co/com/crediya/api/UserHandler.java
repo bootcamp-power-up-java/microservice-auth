@@ -12,6 +12,8 @@ import org.springframework.web.reactive.function.server.ServerRequest;
 import org.springframework.web.reactive.function.server.ServerResponse;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @Component
 @RequiredArgsConstructor
 public class UserHandler {
@@ -21,7 +23,8 @@ public class UserHandler {
 
     public Mono<ServerResponse> getUserById(ServerRequest serverRequest) {
         String id = serverRequest.pathVariable("id");
-        return userUseCase.findUserById(id)
+        UUID userId = UUID.fromString(id);
+        return userUseCase.findUserById(userId)
                 .map(userMapper::toDTO)
                 .flatMap(dto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)

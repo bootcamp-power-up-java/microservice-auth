@@ -10,7 +10,7 @@ public record UserDTO(
         String password,
         String phone,
         String address,
-        double baseSalary,
+        Double baseSalary,
         String roleId
 ) {
 }

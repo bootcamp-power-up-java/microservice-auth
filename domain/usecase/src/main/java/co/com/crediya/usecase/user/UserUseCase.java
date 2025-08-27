@@ -7,12 +7,14 @@ import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.UUID;
+
 @RequiredArgsConstructor
 public class UserUseCase {
 
     private final UserRepository userRepository;
 
-    public Mono<User> findUserById(String id) {
+    public Mono<User> findUserById(UUID id) {
         return userRepository.findById(id);
     }
 
@@ -35,15 +37,12 @@ public class UserUseCase {
     }
 
     public Mono<User> updateUser(User user) {
-        if (user.getId().isEmpty()) {
+        if (user.getId() == null) {
             return Mono.error(new IllegalArgumentException(UserErrorMessages.getIdRequiredForUpdateMessage()));
         }
-        System.out.println("Updating user: " + user.toString());
         return userRepository.findById(user.getId())
                 .switchIfEmpty(Mono.error(new IllegalArgumentException(UserErrorMessages.getUserNotFoundMessage())))
                 .flatMap(existingUser -> {
-                    System.out.println("Usuario obtenido:" + existingUser.getId());
-                    System.out.println(existingUser);
                     User cleanedUser = cleanUserData(user);
                     if (user.getName() != null) {
                         existingUser.setName(cleanedUser.getName());
@@ -51,18 +50,22 @@ public class UserUseCase {
                     if (user.getLastName() != null) {
                         existingUser.setLastName(cleanedUser.getLastName());
                     }
-                    if (user.getEmail() != null && !user.getEmail().equalsIgnoreCase(existingUser.getEmail())) {
-                        existingUser.setEmail(cleanedUser.getEmail());
+                    if (user.getDocumentIdentity() != null) {
+                        existingUser.setDocumentIdentity(cleanedUser.getDocumentIdentity());
+                    }
+                    if (user.getBirthdate() != null) {
+                        existingUser.setBirthdate(cleanedUser.getBirthdate());
+                    }
+                    if (user.getBaseSalary() != null) {
+                        existingUser.setBaseSalary(cleanedUser.getBaseSalary());
                     }
                     validateUserData(existingUser);
-                    System.out.println("Updating existinguser" );
-                    System.out.println(existingUser);
                     return userRepository.update(existingUser);
                 });
     }
 
 
-    public Mono<Void> deleteUserById(String id) {
+    public Mono<Void> deleteUserById(UUID id) {
         return userRepository.deleteById(id);
     }
 
@@ -79,11 +82,17 @@ public class UserUseCase {
         if (user.getName() == null || user.getName().isEmpty()) {
             throw new IllegalArgumentException(UserErrorMessages.getNamesLastNamesRequiredMessage());
         }
+        if (user.getLastName() == null || user.getLastName().isEmpty()) {
+            throw new IllegalArgumentException(UserErrorMessages.getNamesLastNamesRequiredMessage());
+        }
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new IllegalArgumentException(UserErrorMessages.getEmailRequiredMessage());
         }
         if (!user.getEmail().matches(UserConstraints.EMAIL_REGEX)) {
             throw new IllegalArgumentException(UserErrorMessages.getInvalidEmailFormatMessage());
+        }
+        if (user.getBaseSalary() == null) {
+            throw new IllegalArgumentException(UserErrorMessages.getSalaryRequiredMessage());
         }
         if (user.getBaseSalary() < UserConstraints.MIN_SALARY || user.getBaseSalary() > UserConstraints.MAX_SALARY) {
             throw new IllegalArgumentException(UserErrorMessages.getSalaryOutOfRangeMessage());

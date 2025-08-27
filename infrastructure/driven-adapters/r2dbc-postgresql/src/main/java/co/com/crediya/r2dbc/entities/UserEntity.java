@@ -49,7 +49,7 @@ public class UserEntity {
     private String address;
 
     @Column
-    private double baseSalary;
+    private Double baseSalary;
 
     @Column
     private String roleId;

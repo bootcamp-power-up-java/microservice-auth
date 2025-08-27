@@ -9,6 +9,6 @@ public record CreateUserDTO(
         String password,
         String phone,
         String address,
-        double baseSalary
+        Double baseSalary
 ) {
 }

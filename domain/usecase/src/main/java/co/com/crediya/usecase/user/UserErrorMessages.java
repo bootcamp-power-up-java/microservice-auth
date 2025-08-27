@@ -27,6 +27,10 @@ public enum UserErrorMessages {
         return EMAIL_REQUIRED.getMessage();
     }
 
+    public static String getSalaryRequiredMessage() {
+        return SALARY_REQUIRED.getMessage();
+    }
+
     public static String getEmailAlreadyRegisteredMessage() {
         return EMAIL_ALREADY_REGISTERED.getMessage();
     }

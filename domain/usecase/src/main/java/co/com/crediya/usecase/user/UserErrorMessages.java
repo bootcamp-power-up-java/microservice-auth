@@ -1,5 +1,8 @@
 package co.com.crediya.usecase.user;
 
+import lombok.Getter;
+
+@Getter
 public enum UserErrorMessages {
     NAMES_LAST_NAMES_REQUIRED("First and last names are required."),
     EMAIL_REQUIRED("Email is required."),
@@ -12,14 +15,6 @@ public enum UserErrorMessages {
 
     UserErrorMessages(String message) {
         this.message = message;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDynamicMessage(Object... args) {
-        return String.format(this.message, args);
     }
 
     public static String getNamesLastNamesRequiredMessage() {

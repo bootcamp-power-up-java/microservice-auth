@@ -6,6 +6,7 @@ import co.com.crediya.r2dbc.entities.UserEntity;
 import co.com.crediya.r2dbc.helper.ReactiveAdapterOperations;
 import org.reactivecommons.utils.ObjectMapper;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -23,6 +24,14 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
+    @Transactional
+    public Mono<User> save(User user) {
+        UserEntity u = mapper.map(user, UserEntity.class);
+        return repository.save(u)
+                .map(entity -> mapper.map(entity, User.class));
+    }
+
+    @Override
     public Flux<User> findAll() {
         return repository.findAll()
                 .map(entity -> mapper.map(entity, User.class));
@@ -35,6 +44,7 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
+    @Transactional
     public Mono<User> update(User user) {
         UserEntity u = mapper.map(user, UserEntity.class);
         return repository.save(u)
@@ -42,6 +52,7 @@ public class UserReactiveRepositoryAdapter extends ReactiveAdapterOperations<
     }
 
     @Override
+    @Transactional
     public Mono<Void> deleteById(UUID id) {
         return repository.deleteById(id)
                 .then();

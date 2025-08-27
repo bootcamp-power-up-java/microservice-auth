@@ -1,6 +1,6 @@
 ##Spring Configuration
 server:
-  port: 8080
+  port: ${APP_PORT:8080}
 spring:
   application:
     name: MicroserviceAuth
@@ -14,9 +14,10 @@ spring:
     include:
 adapters:
   r2dbc:
-    database: crediya-auth-db
-    host: localhost
-    port: 5432
-    username: postgres
-    password: root
-    schema: public
+    database: ${DB_NAME:postgresql}
+    host: ${DB_HOST:localhost}
+    port: ${DB_PORT:5432}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASS:password}
+    schema: ${DB_SCHEMA:public}
+

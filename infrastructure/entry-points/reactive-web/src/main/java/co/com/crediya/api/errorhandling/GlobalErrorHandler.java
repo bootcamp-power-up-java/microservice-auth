@@ -1,12 +1,12 @@
 package co.com.crediya.api.errorhandling;
 
+import co.com.crediya.model.utils.BusinessException;
 import co.com.crediya.utils.ExceptionResponse;
 import org.springframework.boot.autoconfigure.web.WebProperties;
 import org.springframework.boot.autoconfigure.web.reactive.error.AbstractErrorWebExceptionHandler;
-import org.springframework.boot.web.error.ErrorAttributeOptions;
 import org.springframework.boot.web.reactive.error.ErrorAttributes;
 import org.springframework.context.ApplicationContext;
-import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerCodecConfigurer;
 import org.springframework.stereotype.Component;
@@ -14,10 +14,8 @@ import org.springframework.web.reactive.function.server.*;
 import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
-import java.util.Map;
 
 @Component
-@Order(-2)
 public class GlobalErrorHandler extends AbstractErrorWebExceptionHandler {
 
     public GlobalErrorHandler(ErrorAttributes errorAttributes,
@@ -34,17 +32,31 @@ public class GlobalErrorHandler extends AbstractErrorWebExceptionHandler {
     }
 
     private Mono<ServerResponse> renderErrorResponse(ServerRequest request) {
-        Map<String, Object> errorPropertiesMap = getErrorAttributes(request, ErrorAttributeOptions.defaults());
+        Throwable error = getError(request);
+
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        String details = "Unexpected error";
+
+        if (error instanceof BusinessException be) {
+            try {
+                status = HttpStatus.valueOf(be.getStatus());
+                details = be.getMessage();
+            } catch (Exception e) {
+                // Ignore and use default status and details
+            }
+        }
+
         ExceptionResponse response = ExceptionResponse.builder()
-                .message((String) errorPropertiesMap.get("message"))
+                .message(error.getMessage())
                 .uri(request.path())
-                .code((Integer) errorPropertiesMap.get("status"))
-                .details((String) errorPropertiesMap.get("error"))
+                .code(status.value())
+                .details(details)
                 .timestamp(LocalDateTime.now())
                 .build();
 
-        return ServerResponse.status((Integer) errorPropertiesMap.get("status"))
+        return ServerResponse.status(status)
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(response);
     }
 }
+

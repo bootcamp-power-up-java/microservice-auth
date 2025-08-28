@@ -2,6 +2,9 @@ package co.com.crediya.usecase.user;
 
 import co.com.crediya.model.user.User;
 import co.com.crediya.model.user.gateways.UserRepository;
+import co.com.crediya.model.utils.BusinessException;
+import co.com.crediya.model.utils.GeneralErrorMessages;
+import co.com.crediya.model.utils.HttpStatusCodes;
 import co.com.crediya.utils.StringUtils;
 import lombok.RequiredArgsConstructor;
 import reactor.core.publisher.Flux;
@@ -27,7 +30,8 @@ public class UserUseCase {
         validateUserData(cleanedUser);
         return userRepository.findByEmail(cleanedUser.getEmail())
                 .flatMap(existingUser -> Mono.error(
-                        new IllegalArgumentException(UserErrorMessages.getEmailAlreadyRegisteredMessage())
+                        new BusinessException(GeneralErrorMessages.RESOURCE_ALREADY_EXISTS.getMessage(),
+                                HttpStatusCodes.CONFLICT.getCode())
                 )).switchIfEmpty(Mono.defer(() -> userRepository.save(cleanedUser)))
                 .cast(User.class);
     }
@@ -38,10 +42,12 @@ public class UserUseCase {
 
     public Mono<User> updateUser(User user) {
         if (user.getId() == null) {
-            return Mono.error(new IllegalArgumentException(UserErrorMessages.getIdRequiredForUpdateMessage()));
+            return Mono.error(new BusinessException(GeneralErrorMessages.FIELDS_REQUIRED.getMessage(),
+                    HttpStatusCodes.BAD_REQUEST.getCode()));
         }
         return userRepository.findById(user.getId())
-                .switchIfEmpty(Mono.error(new IllegalArgumentException(UserErrorMessages.getUserNotFoundMessage())))
+                .switchIfEmpty(Mono.error(new BusinessException(GeneralErrorMessages.RESOURCE_NOT_FOUND.getMessage(),
+                        HttpStatusCodes.NOT_FOUND.getCode())))
                 .flatMap(existingUser -> {
                     User cleanedUser = cleanUserData(user);
                     if (user.getName() != null) {
@@ -80,22 +86,22 @@ public class UserUseCase {
 
     private void validateUserData(User user) {
         if (user.getName() == null || user.getName().isEmpty()) {
-            throw new IllegalArgumentException(UserErrorMessages.getNamesLastNamesRequiredMessage());
+            throw new BusinessException(GeneralErrorMessages.INVALID_DATA.getMessage(), HttpStatusCodes.BAD_REQUEST.getCode());
         }
         if (user.getLastName() == null || user.getLastName().isEmpty()) {
-            throw new IllegalArgumentException(UserErrorMessages.getNamesLastNamesRequiredMessage());
+            throw new BusinessException(GeneralErrorMessages.INVALID_DATA.getMessage(), HttpStatusCodes.BAD_REQUEST.getCode());
         }
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
-            throw new IllegalArgumentException(UserErrorMessages.getEmailRequiredMessage());
+            throw new BusinessException(GeneralErrorMessages.INVALID_DATA.getMessage(), HttpStatusCodes.BAD_REQUEST.getCode());
         }
         if (!user.getEmail().matches(UserConstraints.EMAIL_REGEX)) {
-            throw new IllegalArgumentException(UserErrorMessages.getInvalidEmailFormatMessage());
+            throw new BusinessException(GeneralErrorMessages.INVALID_DATA.getMessage(), HttpStatusCodes.BAD_REQUEST.getCode());
         }
         if (user.getBaseSalary() == null) {
-            throw new IllegalArgumentException(UserErrorMessages.getSalaryRequiredMessage());
+            throw new BusinessException(GeneralErrorMessages.INVALID_DATA.getMessage(), HttpStatusCodes.BAD_REQUEST.getCode());
         }
         if (user.getBaseSalary() < UserConstraints.MIN_SALARY || user.getBaseSalary() > UserConstraints.MAX_SALARY) {
-            throw new IllegalArgumentException(UserErrorMessages.getSalaryOutOfRangeMessage());
+            throw new BusinessException(GeneralErrorMessages.INVALID_DATA.getMessage(), HttpStatusCodes.BAD_REQUEST.getCode());
         }
     }
 

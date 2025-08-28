@@ -4,7 +4,9 @@ import co.com.crediya.api.dtos.CreateUserDTO;
 import co.com.crediya.api.dtos.UpdateUserDTO;
 import co.com.crediya.api.dtos.UserDTO;
 import co.com.crediya.api.mappers.UserDTOMapper;
-import co.com.crediya.usecase.user.UserErrorMessages;
+import co.com.crediya.model.utils.BusinessException;
+import co.com.crediya.model.utils.HttpStatusCodes;
+import co.com.crediya.model.utils.GeneralErrorMessages;
 import co.com.crediya.usecase.user.UserUseCase;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
@@ -40,8 +42,7 @@ public class UserHandler {
                 .map(userMapper::toDTO)
                 .flatMap(dto -> ServerResponse.ok()
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(dto))
-                .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));
+                        .bodyValue(dto));
     }
 
     public Mono<ServerResponse> getAllUsers(ServerRequest serverRequest) {
@@ -66,7 +67,8 @@ public class UserHandler {
         String id = serverRequest.pathVariable("id");
         UUID userId = UUID.fromString(id);
         return userUseCase.findUserById(userId)
-                .switchIfEmpty(Mono.error(new IllegalArgumentException(UserErrorMessages.getUserNotFoundMessage())))
+                .switchIfEmpty(Mono.error(new BusinessException(GeneralErrorMessages.RESOURCE_NOT_FOUND.getMessage(),
+                        HttpStatusCodes.NOT_FOUND.getCode())))
                 .flatMap(user -> userUseCase.deleteUserById(userId)
                         .then(ServerResponse.noContent().build()))
                 .onErrorResume(e -> ServerResponse.badRequest().bodyValue(e.getMessage()));

@@ -1,3 +1,7 @@
+app-description: Auth Microservice API for managing auth of CrediYa
+app-title: Auth Management API
+app-version: 1.0.0
+
 server:
   port: "${APP_PORT:8080}"
 spring:
@@ -30,3 +34,15 @@ management:
         enabled: true
 cors:
   allowed-origins: "http://localhost:4200,http://localhost:8080"
+
+springdoc:
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /api/docs
+  jwt:
+    key: AuthorizationJWT
+    scheme: bearer
+    format: JWT
+    name: Authorization
